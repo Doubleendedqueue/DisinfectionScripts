@@ -9,16 +9,17 @@ call :killProcess "cltmng.exe"
 call :killProcess "cltmngui.exe"
 call :deleteService "CltMngSvc"
 
-call :deleteDirectory "%programfiles%\SearchProtect"
-call :deleteDirectory "%allusersappdata%\SearchProtect"
-call :deleteDirectory "%appdata%\SearchProtect"
+call :deleteDirectory "%PROGRAMFILES%\SearchProtect"
+call :deleteDirectory "%ALLUSERSAPPDATA%\SearchProtect"
+call :deleteDirectory "%APPDATA%\SearchProtect"
+call :deleteDirectory "%LOCALAPPDATA%\SearchProtect"
 
 reg delete "HKLM\SOFTWARE\SearchProtect" /f
 reg delete "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\SearchProtect" /f
 
+call :cleanTemps
 call :resetIE
 call :resetFirefox
-call :cleanTemps
 echo.disinfection done
 ) 1> log.txt 2>&1
 
@@ -64,31 +65,36 @@ goto :eof
 :: cleanFolder foldername
 :cleanFolder
 if exist "%~1" (
-   echo.cleaning folder "%~1"
+   echo.cleaning folder %~1
    for /d %%D in ("%~1\*") do rd /s /q "%%D"
    del /f /q "%~1\*"
 )
 goto :eof
 
-:: reset Firefox settings
+:: soft reset of Firefox settings after CSP infection
 :resetFirefox
 echo.resetting Firefox
 call :killProcess firefox.exe
-call :deleteDirectory "%UserProfile%\AppData\Local\Mozilla\Firefox\Profiles"
-call :deleteDirectory "%AppData%\Mozilla\Firefox"
+for /d %%D in ("%APPDATA%\Mozilla\Firefox\Profiles\*.default") do (
+  echo user_pref^("browser.startup.homepage","about:home"^);>>"%%D\prefs.js"
+  echo user_pref^("browser.newtab.url","about:newtab"^);>>"%%D\prefs.js"
+  echo user_pref^("browser.search.defaultenginename","Google"^);>>"%%D\prefs.js"
+  echo user_pref^("browser.search.selectedEngine",""^);>>"%%D\prefs.js"
+)
 goto :eof
 
-:: reset IE settings
+:: soft reset of IE settings after CSP infection
 :resetIE
 echo.resetting Internet Explorer
 call :killProcess iexplore.exe
-reg delete "HKCU\Software\Microsoft\Internet Explorer" /f
+reg delete "HKCU\Software\Microsoft\Internet Explorer\Main" /v "Start Page" /f
+reg delete "HKCU\Software\Microsoft\Internet Explorer\SearchScopes" /f
 goto :eof
 
 :: clean temporary folders and internet caches
 :cleanTemps
 echo.cleaning temporary files
-call :cleanFolder "%temp%"
+call :cleanFolder "%TEMP%"
 call :cleanFolder "%USERPROFILE%\Local Settings\Temporary Internet Files"
 call :cleanFolder "%USERPROFILE%\Local Settings\Temp"
 call :cleanFolder "%LOCALAPPDATA%\Microsoft\Windows\Temporary Internet Files\Low\Content.IE5"
