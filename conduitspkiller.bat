@@ -4,6 +4,8 @@
 :: Main Script
 ::-----------------------------------
 
+echo.Conduit SP Disinfector is cleaning your system ...
+
 (
 call :killProcess "cltmng.exe"
 call :killProcess "cltmngui.exe"
@@ -47,7 +49,7 @@ goto :eof
 :: deleteDirectory directoryname
 :deleteDirectory
 echo.removing directory %~1
-if exist %~1 (
+if exist "%~1" (
   attrib /s /d -s -h -r "%~1"
   rd /s /q "%~1"
 ) else echo.not found
@@ -56,7 +58,7 @@ goto :eof
 :: deleteFile filename
 :deleteFile
 echo.removing file %~1
-if exist %~1 (
+if exist "%~1" (
   attrib -s -h -r "%~1"
   del /f /q "%~1"
 ) else echo.not found
