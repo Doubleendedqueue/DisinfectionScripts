@@ -24,6 +24,7 @@ call :deleteDirectory "%PROGRAMDATA%\IHProtectUpDate"
 call :deleteDirectory "%ALLUSERSAPPDATA%\SearchProtect"
 call :deleteDirectory "%APPDATA%\SearchProtect"
 call :deleteDirectory "%LOCALAPPDATA%\SearchProtect"
+call :deleteDirectory "%LOCALAPPDATA%\avayvaxvaa"
 
 reg delete "HKLM\SOFTWARE\SearchProtect" /f
 reg delete "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\SearchProtect" /f
